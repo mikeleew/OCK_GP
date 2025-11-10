@@ -2,6 +2,11 @@ import jax
 import jax.numpy as jnp
 from typing import Callable
 
+def exp_dot_kernel(x, y, bw=1.0):
+    '''Compute the Exponential Dot Product kernel between two sets of vectors.'''
+    dot_product = x @ jnp.swapaxes(y, -1, -2)
+    return jnp.exp(dot_product / bw**2)
+
 def gaussian_kernel(x, y, bw=1.0):
     '''Compute the Gaussian kernel between two sets of vectors.'''
     norm2x = jnp.linalg.norm(x, axis=-1) ** 2
@@ -11,7 +16,7 @@ def gaussian_kernel(x, y, bw=1.0):
 
 def gaussian_kernel_len_scales(x, y, len_scales):
     '''Compute the Gaussian kernel between two sets of vectors with length scales.'''
-    diff = (x[:, None, :] - y[None, :, :]) / len_scales
+    diff = (x[:, None, :] - y[None, :, :]) / len_scales[None, None, :]
     norm2 = jnp.sum(diff ** 2, axis=-1)
     return jnp.exp(-0.5 * norm2)
 
